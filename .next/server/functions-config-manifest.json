@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "functions": {
+    "/api/aptitude": {
+      "maxDuration": 60
+    },
+    "/api/chat": {
+      "maxDuration": 60
+    },
+    "/api/interview": {
+      "maxDuration": 60
+    },
+    "/api/resume": {
+      "maxDuration": 60
+    }
+  }
+}
