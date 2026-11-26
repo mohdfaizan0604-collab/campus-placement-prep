@@ -10,7 +10,7 @@ import type { ChatMessage } from "./types";
  * requestGemini() and keep streamChat() / generateJSON() the same.
  */
 
-const DEFAULT_MODEL = "gemini-3.8-flash";
+const DEFAULT_MODEL = "gemini-3.5-flash";
 const API_ROOT = "https://generativelanguage.googleapis.com/v1beta/models";
 
 type GeminiRole = "user" | "model";
