@@ -108,21 +108,41 @@ async function requestGemini(input: GeminiRequest, stream: boolean): Promise<Res
   url.searchParams.set("key", apiKey);
   if (stream) url.searchParams.set("alt", "sse");
 
-  const response = await fetch(url, {
+  
+let response;
+
+try {
+  response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    signal: AbortSignal.timeout(45_000),
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: input.system }] },
+      systemInstruction: {
+        parts: [{ text: input.system }],
+      },
       contents: toContents(input.messages),
       generationConfig: {
         temperature: input.temperature,
         maxOutputTokens: input.maxOutputTokens,
-        // Low thinking keeps free-tier replies fast and leaves room for the actual answer.
-        thinkingConfig: { thinkingLevel: "LOW", includeThoughts: false },
-        ...(input.json ? { responseMimeType: "application/json" } : {}),
+        thinkingConfig: {
+          thinkingLevel: "LOW",
+          includeThoughts: false,
+        },
+        ...(input.json
+          ? { responseMimeType: "application/json" }
+          : {}),
       },
     }),
   });
+} catch (error) {
+  if (error instanceof Error && error.name === "TimeoutError") {
+    throw new LlmError(
+      "Gemini took too long to respond. Please try again."
+    );
+  }
+
+  throw error;
+}
 
   if (!response.ok) {
     const body = await response.text();
